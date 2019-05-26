@@ -32,7 +32,7 @@ class CitiesTVController: UITableViewController {
     }
     
     @IBAction func addCity(_ sender: UIBarButtonItem) {
-        present(AppData.setAlert(type: "City", title: "Insert City", style: .alert, message: "Add new city in the list"), animated: true)
+        present(AppData.setAlert(type: "City", title: "Insert City", style: .alert, message: "Add a new city to the list"), animated: true)
     }
     
     //Method Prepare to go to PictureVC

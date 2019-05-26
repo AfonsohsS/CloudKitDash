@@ -34,7 +34,7 @@ class CountriesTVController: UITableViewController {
     
     //Add new Country
     @IBAction func addCountry(_ sender: UIBarButtonItem) {
-        present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add new country in the list"), animated: true)
+        present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add a new country to the list"), animated: true)
     }
     
     
