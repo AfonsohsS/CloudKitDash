@@ -15,6 +15,8 @@
 		14C773A42299834400336D8B /* ApplicationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773A32299834400336D8B /* ApplicationData.swift */; };
 		14C773A92299F2A600336D8B /* CountriesTVController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773A82299F2A600336D8B /* CountriesTVController.swift */; };
 		14C773AB2299F2BB00336D8B /* CitiesTVController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773AA2299F2BB00336D8B /* CitiesTVController.swift */; };
+		14C773AD229AE26E00336D8B /* PictureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773AC229AE26E00336D8B /* PictureViewController.swift */; };
+		14C773AF229B249F00336D8B /* Vancouver.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14C773AE229B249F00336D8B /* Vancouver.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		14C773A32299834400336D8B /* ApplicationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationData.swift; sourceTree = "<group>"; };
 		14C773A82299F2A600336D8B /* CountriesTVController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountriesTVController.swift; sourceTree = "<group>"; };
 		14C773AA2299F2BB00336D8B /* CitiesTVController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitiesTVController.swift; sourceTree = "<group>"; };
+		14C773AC229AE26E00336D8B /* PictureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureViewController.swift; sourceTree = "<group>"; };
+		14C773AE229B249F00336D8B /* Vancouver.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Vancouver.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				14C7739D22997FDF00336D8B /* CloudKitDash.entitlements */,
+				14C773AE229B249F00336D8B /* Vancouver.jpg */,
 				14C7738B22997FD000336D8B /* AppDelegate.swift */,
 				14C773A52299834B00336D8B /* Models */,
 				14C773A22299831100336D8B /* Views */,
@@ -88,6 +93,7 @@
 			children = (
 				14C773A82299F2A600336D8B /* CountriesTVController.swift */,
 				14C773AA2299F2BB00336D8B /* CitiesTVController.swift */,
+				14C773AC229AE26E00336D8B /* PictureViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -175,6 +181,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14C7739622997FD200336D8B /* LaunchScreen.storyboard in Resources */,
+				14C773AF229B249F00336D8B /* Vancouver.jpg in Resources */,
 				14C7739322997FD200336D8B /* Assets.xcassets in Resources */,
 				14C7739122997FD000336D8B /* Main.storyboard in Resources */,
 			);
@@ -191,6 +198,7 @@
 				14C773A42299834400336D8B /* ApplicationData.swift in Sources */,
 				14C773AB2299F2BB00336D8B /* CitiesTVController.swift in Sources */,
 				14C7738C22997FD000336D8B /* AppDelegate.swift in Sources */,
+				14C773AD229AE26E00336D8B /* PictureViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

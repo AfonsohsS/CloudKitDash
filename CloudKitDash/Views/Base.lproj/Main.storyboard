@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -45,7 +46,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Countries" id="mBg-qc-4Ny">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="rFr-WY-IWi"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="rFr-WY-IWi">
+                            <connections>
+                                <action selector="addCountry:" destination="IAy-bb-oan" id="3L1-0S-7MZ"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qrz-Ox-fEs" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -77,6 +82,9 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="3zJ-6V-mQd" kind="show" identifier="showPicture" id="zg8-ew-xWz"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -85,12 +93,45 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Cities" id="PyQ-Qh-TYv">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="1gJ-dH-Nng"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="1gJ-dH-Nng">
+                            <connections>
+                                <action selector="addCity:" destination="wn7-23-o2N" id="md5-ep-fDI"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yud-ih-L2Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1351" y="107"/>
+        </scene>
+        <!--Picture View Controller-->
+        <scene sceneID="6PZ-e4-Mv8">
+            <objects>
+                <viewController id="3zJ-6V-mQd" customClass="PictureViewController" customModule="CloudKitDash" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="NrO-2I-w6s">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fdb-1I-JAE">
+                                <rect key="frame" x="20" y="108" width="374" height="734"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="fdb-1I-JAE" firstAttribute="leading" secondItem="XXW-cR-ri4" secondAttribute="leading" constant="20" id="Al8-LY-xX0"/>
+                            <constraint firstItem="XXW-cR-ri4" firstAttribute="trailing" secondItem="fdb-1I-JAE" secondAttribute="trailing" constant="20" id="B5c-pg-RCt"/>
+                            <constraint firstItem="fdb-1I-JAE" firstAttribute="top" secondItem="XXW-cR-ri4" secondAttribute="top" constant="20" id="N3r-bV-PVE"/>
+                            <constraint firstItem="XXW-cR-ri4" firstAttribute="bottom" secondItem="fdb-1I-JAE" secondAttribute="bottom" constant="20" id="y18-rI-o9f"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="XXW-cR-ri4"/>
+                    </view>
+                    <connections>
+                        <outlet property="cityPicture" destination="fdb-1I-JAE" id="gCB-0k-e09"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5bh-3G-HWU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2150.7246376811595" y="110.49107142857143"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="O0I-b0-m96">

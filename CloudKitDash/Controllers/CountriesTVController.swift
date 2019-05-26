@@ -7,36 +7,67 @@
 //
 
 import UIKit
+import CloudKit
 
 class CountriesTVController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        //Observer to Update Interface to call updateInterface()
+        let notCenter = NotificationCenter.default
+        let name = Notification.Name("Update Interface")
+        notCenter.addObserver(self, selector: #selector(updateInterface(notification:)), name: name, object: nil)
+        
+        //Read and show the values when the view is loaded
+        //The method performs a query on the database to get all the countries
+        //available and posts a notification when it is over
+        AppData.readCountries()
+        
+        //Note: This is why we register the observer for the notification before calling the method
 
     }
+    
+    @objc func updateInterface(notification: Notification) {
+        tableView.reloadData()
+    }
+    
+    //Add new Country
+    @IBAction func addCountry(_ sender: UIBarButtonItem) {
+        present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add new country in the list"), animated: true)
+    }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showCities" {
+            if let indexPath = self.tableView.indexPathForSelectedRow {
+                let record = AppData.listCountries[indexPath.row]
+                AppData.selectedCountry = record.recordID
+            }
+        }
+    }
+    
 
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return AppData.listCountries.count
     }
 
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "countriesCell", for: indexPath)
 
-        // Configure the cell...
+        let record = AppData.listCountries[indexPath.row]
+        
+        if let name = record["countryName"] as? String {
+            cell.textLabel?.text = name
+        }
 
         return cell
     }
-    */
+
 
     /*
     // Override to support conditional editing of the table view.
@@ -62,14 +93,6 @@ class CountriesTVController: UITableViewController {
     // Override to support rearranging the table view.
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
     }
     */
 

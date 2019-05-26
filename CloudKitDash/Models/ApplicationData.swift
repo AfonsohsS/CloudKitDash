@@ -76,13 +76,22 @@ class ApplicationData {
             
             //Create a record object of type Cities
             let record = CKRecord(recordType: "Cities", recordID: id)
-            
             record.setObject(text as NSString, forKey: "cityName")
             
             //Create a reference to the Country the City belongs to, and an action of type "deleteSelf"
             //"when the record of the country is deleted, this record is deleted as well."
             let reference = CKRecord.Reference(recordID: selectedCountry, action: .deleteSelf)
             record.setObject(reference, forKey: "country")
+            
+            //We get the URL of an image included in the project called Vancouver.jpg
+            let bundle = Bundle.main
+            if let fileURL = bundle.url(forResource: "Vancouver", withExtension: "jpg") {
+                
+                //Create a CKAsset object with it, and assign the object to the record
+                //of every city with the key "picture"
+                let asset = CKAsset(fileURL: fileURL)
+                record.setObject(asset, forKey: "picture")
+            }
             
             //Save record in CloudKit server asynchronously
             database.save(record) { (recordSaved, error) in
@@ -162,6 +171,31 @@ class ApplicationData {
             let name = Notification.Name("Update Interface")
             center.post(name: name, object: nil, userInfo: nil)
         }
+    }
+    
+    //Alert Template
+    func setAlert(type: String, title: String, style: UIAlertController.Style, message: String?) -> UIAlertController {
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: style)
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(cancel)
+        let action = UIAlertAction(title: "Save", style: .default) { (action) in
+            if let fields = alert.textFields {
+                let name = fields[0].text!
+                
+                if type == "Country" {
+                    self.insertCountry(name: name)
+                } else if type == "City" {
+                    self.insertCity(name: name)
+                } else {
+                    print("Type não indentificado")
+                }
+            }
+        }
+        alert.addAction(action)
+        alert.addTextField(configurationHandler: nil)
+        
+        return alert
     }
 }
 
