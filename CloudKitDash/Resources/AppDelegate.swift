@@ -8,11 +8,14 @@
 
 import UIKit
 import CloudKit
+import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var container: NSPersistentContainer!
+    var context: NSManagedObjectContext!
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -29,6 +32,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let userSettings = UserDefaults.standard
         let values = ["subscriptionSaved" : false, "zoneCreated" : false]
         userSettings.register(defaults: values)
+        
+        //Setting CoreData's container and context
+        container = NSPersistentContainer(name: "places")
+        container.loadPersistentStores { (storeDescription, error) in
+            if error != nil {
+                print("Error loading data")
+            } else {
+                self.context = self.container.viewContext
+            }
+        }
         
         //Register the application with icloud servers
         application.registerForRemoteNotifications()

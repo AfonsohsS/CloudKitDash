@@ -51,11 +51,18 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Countries" id="mBg-qc-4Ny">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="rFr-WY-IWi">
-                            <connections>
-                                <action selector="addCountry:" destination="IAy-bb-oan" id="3L1-0S-7MZ"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="rFr-WY-IWi">
+                                <connections>
+                                    <action selector="addCountry:" destination="IAy-bb-oan" id="3L1-0S-7MZ"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="edit" id="U1K-4i-I4X">
+                                <connections>
+                                    <action selector="editCountry:" destination="IAy-bb-oan" id="kG8-A8-FHg"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qrz-Ox-fEs" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -103,11 +110,18 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Cities" id="PyQ-Qh-TYv">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="1gJ-dH-Nng">
-                            <connections>
-                                <action selector="addCity:" destination="wn7-23-o2N" id="md5-ep-fDI"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="1gJ-dH-Nng">
+                                <connections>
+                                    <action selector="addCity:" destination="wn7-23-o2N" id="md5-ep-fDI"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="edit" id="amh-V6-Bcq">
+                                <connections>
+                                    <action selector="editCity:" destination="wn7-23-o2N" id="hsS-VU-nlP"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yud-ih-L2Y" userLabel="First Responder" sceneMemberID="firstResponder"/>

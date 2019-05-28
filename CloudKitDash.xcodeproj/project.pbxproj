@@ -72,10 +72,7 @@
 		14C7738A22997FD000336D8B /* CloudKitDash */ = {
 			isa = PBXGroup;
 			children = (
-				14C7739D22997FDF00336D8B /* CloudKitDash.entitlements */,
-				14C773B0229D413E00336D8B /* Places.xcdatamodeld */,
-				14C773AE229B249F00336D8B /* Vancouver.jpg */,
-				14C7738B22997FD000336D8B /* AppDelegate.swift */,
+				14C773B5229D8DD900336D8B /* Resources */,
 				14C773A52299834B00336D8B /* Models */,
 				14C773A22299831100336D8B /* Views */,
 				14C773A12299830400336D8B /* Controllers */,
@@ -118,6 +115,17 @@
 				14C773A32299834400336D8B /* ApplicationData.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		14C773B5229D8DD900336D8B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				14C7738B22997FD000336D8B /* AppDelegate.swift */,
+				14C7739D22997FDF00336D8B /* CloudKitDash.entitlements */,
+				14C773B0229D413E00336D8B /* Places.xcdatamodeld */,
+				14C773AE229B249F00336D8B /* Vancouver.jpg */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

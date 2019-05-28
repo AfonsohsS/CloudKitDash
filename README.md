@@ -1,10 +1,12 @@
 # CloudKitDash
 
-This app is an exemple which we use the basics classes and methods of the CloudKit.
+This application is an example of using CloudKit's basic classes and methods.
 
-If you want more detail about this exemple or you want to learn more about CloudKit, 
+If you want more details about this example or want to know more about CloudKit,
 you can find more information in http://www.formasterminds.com
 
 iOS Apps for Masterminds
+
 4th Edition
+
 ISBN: 978-1724466440

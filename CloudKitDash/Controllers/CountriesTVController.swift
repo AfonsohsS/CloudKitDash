@@ -37,6 +37,11 @@ class CountriesTVController: UITableViewController {
         present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add a new country to the list"), animated: true)
     }
     
+    @IBAction func editCountry(_ sender: UIBarButtonItem) {
+        
+    }
+    
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showCities" {

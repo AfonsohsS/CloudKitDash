@@ -35,6 +35,11 @@ class CitiesTVController: UITableViewController {
         present(AppData.setAlert(type: "City", title: "Insert City", style: .alert, message: "Add a new city to the list"), animated: true)
     }
     
+    @IBAction func editCity(_ sender: UIBarButtonItem) {
+        
+    }
+    
+    
     //Method Prepare to go to PictureVC
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showPicture" {

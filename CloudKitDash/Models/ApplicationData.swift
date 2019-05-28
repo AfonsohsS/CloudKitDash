@@ -8,6 +8,7 @@
 
 import UIKit
 import CloudKit
+import CoreData
 
 class ApplicationData {
     
@@ -25,7 +26,14 @@ class ApplicationData {
     //Array with the list of the cities available for a specific country
     var listCities: [CKRecord] = []
     
+    //Reference to the CoreData Context
+    var context: NSManagedObjectContext!
+    
     init() {
+        
+        let app = UIApplication.shared
+        let appDelegate = app.delegate as! AppDelegate
+        context = appDelegate.context
         
         //Get the container from PrivateCloudDatabase
         let container = CKContainer.default()
@@ -282,6 +290,9 @@ class ApplicationData {
     ///Getting the updates from the server
     func downloadUpdates(finishClosure: @escaping (UIBackgroundFetchResult) -> Void) {
         
+        var listRecordsUpdated: [CKRecord] = []
+        var listRecordsDeleted: [String:String] = [:]
+        
         // 1. Defining the properties we are going to use to store the tokens
         // (one for the database and another for the custom zone)
         
@@ -381,6 +392,8 @@ class ApplicationData {
                 //Operation 1: This closure is called every time a new or updated record is received.
                 fetchOperation.recordChangedBlock = { (record) in
                     
+                    listRecordsUpdated.append(record)
+                    
                     //First we have to check if the record is of type Countries or Cities
                     // and store the record in the corresponding array
                     if record.recordType == "Countries" {
@@ -424,6 +437,9 @@ class ApplicationData {
                 //Operation 2: This closure is called every time the app receives the ID of a deleted
                 //record (a record that was deleted from the CloudKit database).
                 fetchOperation.recordWithIDWasDeletedBlock = { (recordID, recordType) in
+                    
+                    listRecordsDeleted[recordID.recordName] = recordType
+                    
                     if recordType == "Countries" {
                         let index = self.listCountries.firstIndex(where: { (item) -> Bool in
                             return item.recordID == recordID
@@ -450,10 +466,22 @@ class ApplicationData {
                 
                 //Operation 4: The same above
                 fetchOperation.recordZoneFetchCompletionBlock = { (zoneID, token, data, more, error) in
+             
                     if error != nil {
                         print("Error in fetchOperation.recordZoneFetchCompletionBlock")
                     } else {
                         changeZoneToken = token
+                        
+                        //To store the records that were updated in an array called listRecordsUpdated and
+                        //the record IDs of the records that were deleted in a dictionary called listRecordsDeleted.
+                        
+                        //When the fetching of the record zone is finished, we call the methods updateLocalRecords()
+                        //and deleteLocalRecords() with these values to perform the corresponding changes in the
+                        //persistent store.
+                        self.updateLocalRecords(listRecordsUpdated: listRecordsUpdated)
+                        self.deleteLocalRecords(listRecordsDeleted: listRecordsDeleted)
+                        listRecordsUpdated.removeAll()
+                        listRecordsDeleted.removeAll()
                     }
                 }
                 
@@ -479,7 +507,11 @@ class ApplicationData {
                                 userSettings.set(data, forKey: "changeZoneToken")
                             }
                         }
-                        self.updateInterface()
+                        ///Removida com a implementação do CoreData
+//                        self.updateInterface()
+                        
+                        self.updateLocalReference()
+                        
                         //If there are chnages we have to tell the system that new data has been downloaded.
                         finishClosure(.newData)
                     }
