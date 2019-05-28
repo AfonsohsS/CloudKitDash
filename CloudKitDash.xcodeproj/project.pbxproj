@@ -18,6 +18,7 @@
 		14C773AD229AE26E00336D8B /* PictureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773AC229AE26E00336D8B /* PictureViewController.swift */; };
 		14C773AF229B249F00336D8B /* Vancouver.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14C773AE229B249F00336D8B /* Vancouver.jpg */; };
 		14C773B2229D413E00336D8B /* Places.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 14C773B0229D413E00336D8B /* Places.xcdatamodeld */; };
+		14C773B4229D46A300336D8B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 14C773B3229D46A300336D8B /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		14C773AC229AE26E00336D8B /* PictureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureViewController.swift; sourceTree = "<group>"; };
 		14C773AE229B249F00336D8B /* Vancouver.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Vancouver.jpg; sourceTree = "<group>"; };
 		14C773B1229D413E00336D8B /* Places.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Places.xcdatamodel; sourceTree = "<group>"; };
+		14C773B3229D46A300336D8B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 		14C7737F22997FD000336D8B = {
 			isa = PBXGroup;
 			children = (
+				14C773B3229D46A300336D8B /* README.md */,
 				14C7738A22997FD000336D8B /* CloudKitDash */,
 				14C7738922997FD000336D8B /* Products */,
 				14C7739E22997FE300336D8B /* Frameworks */,
@@ -185,6 +188,7 @@
 			files = (
 				14C7739622997FD200336D8B /* LaunchScreen.storyboard in Resources */,
 				14C773AF229B249F00336D8B /* Vancouver.jpg in Resources */,
+				14C773B4229D46A300336D8B /* README.md in Resources */,
 				14C7739322997FD200336D8B /* Assets.xcassets in Resources */,
 				14C7739122997FD000336D8B /* Main.storyboard in Resources */,
 			);
