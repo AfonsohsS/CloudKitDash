@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.99" systemVersion="18F203" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Cities" representedClassName="Cities" syncable="YES" codeGenerationType="class">
+        <attribute name="ckMetadata" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="ckPicture" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="ckRecordName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ckReference" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ckUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="picture" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <relationship name="country" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Countries" inverseName="cities" inverseEntity="Countries" syncable="YES"/>
+    </entity>
+    <entity name="CKDelete" representedClassName="CKDelete" syncable="YES" codeGenerationType="class">
+        <attribute name="recordName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="zoneName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Countries" representedClassName="Countries" syncable="YES" codeGenerationType="class">
+        <attribute name="ckMetadata" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="ckRecordName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ckUpload" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="cities" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Cities" inverseName="country" inverseEntity="Cities" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Countries" positionX="-461.96875" positionY="-338.265625" width="128" height="118"/>
+        <element name="Cities" positionX="-260.984375" positionY="-336.41015625" width="128" height="163"/>
+        <element name="CKDelete" positionX="-86.81640625" positionY="-334.51171875" width="128" height="73"/>
+    </elements>
+</model>

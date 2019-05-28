@@ -17,6 +17,7 @@
 		14C773AB2299F2BB00336D8B /* CitiesTVController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773AA2299F2BB00336D8B /* CitiesTVController.swift */; };
 		14C773AD229AE26E00336D8B /* PictureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C773AC229AE26E00336D8B /* PictureViewController.swift */; };
 		14C773AF229B249F00336D8B /* Vancouver.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 14C773AE229B249F00336D8B /* Vancouver.jpg */; };
+		14C773B2229D413E00336D8B /* Places.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 14C773B0229D413E00336D8B /* Places.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		14C773AA2299F2BB00336D8B /* CitiesTVController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitiesTVController.swift; sourceTree = "<group>"; };
 		14C773AC229AE26E00336D8B /* PictureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureViewController.swift; sourceTree = "<group>"; };
 		14C773AE229B249F00336D8B /* Vancouver.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Vancouver.jpg; sourceTree = "<group>"; };
+		14C773B1229D413E00336D8B /* Places.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Places.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				14C7739D22997FDF00336D8B /* CloudKitDash.entitlements */,
+				14C773B0229D413E00336D8B /* Places.xcdatamodeld */,
 				14C773AE229B249F00336D8B /* Vancouver.jpg */,
 				14C7738B22997FD000336D8B /* AppDelegate.swift */,
 				14C773A52299834B00336D8B /* Models */,
@@ -199,6 +202,7 @@
 				14C773AB2299F2BB00336D8B /* CitiesTVController.swift in Sources */,
 				14C7738C22997FD000336D8B /* AppDelegate.swift in Sources */,
 				14C773AD229AE26E00336D8B /* PictureViewController.swift in Sources */,
+				14C773B2229D413E00336D8B /* Places.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +404,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		14C773B0229D413E00336D8B /* Places.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				14C773B1229D413E00336D8B /* Places.xcdatamodel */,
+			);
+			currentVersion = 14C773B1229D413E00336D8B /* Places.xcdatamodel */;
+			path = Places.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 14C7738022997FD000336D8B /* Project object */;
 }
