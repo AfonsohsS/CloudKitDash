@@ -15,18 +15,16 @@ class PictureViewController: UIViewController {
 
     @IBOutlet weak var cityPicture: UIImageView!
     
-    var selectedCity: CKRecord!
+    var selectedCity: Cities!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         if selectedCity != nil {
-            if let asset = selectedCity["picture"] as? CKAsset {
-                self.cityPicture.image = UIImage(contentsOfFile: asset.fileURL!.path)
+            
+            if let picture = selectedCity.picture {
+                cityPicture.image = UIImage(data: picture)
             }
         }
-        
     }
-
-
 }

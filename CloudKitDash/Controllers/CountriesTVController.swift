@@ -38,30 +38,14 @@ class CountriesTVController: UITableViewController, NSFetchedResultsControllerDe
         do {
             try fetchedController.performFetch()
         } catch {
-            print("Error Fetching Data in Countries viewDidLoad()")
+            print("Error Fetching Data in CountriesTVController viewDidLoad()")
         }
         
-//        //Observer to Update Interface to call updateInterface()
-//        let notCenter = NotificationCenter.default
-//        let name = Notification.Name("Update Interface")
-//        notCenter.addObserver(self, selector: #selector(updateInterface(notification:)), name: name, object: nil)
-//
-//        //Read and show the values when the view is loaded
-//        //The method performs a query on the database to get all the countries
-//        //available and posts a notification when it is over
-//        AppData.readCountries()
-//
-//        //Note: This is why we register the observer for the notification before calling the method
-        
-    }
-    
-    @objc func updateInterface(notification: Notification) {
-        tableView.reloadData()
     }
     
     //Add new Country
     @IBAction func addCountry(_ sender: UIBarButtonItem) {
-        present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add a new country to the list"), animated: true)
+        present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add a new country to the list", selectedCountry: nil), animated: true)
     }
     
     @IBAction func editCountry(_ sender: UIBarButtonItem) {
@@ -109,22 +93,22 @@ class CountriesTVController: UITableViewController, NSFetchedResultsControllerDe
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         switch type {
-        case .delete:
-            if let path = indexPath {
-                tableView.deleteRows(at: [path], with: .fade)
-            }
-        case .insert:
-            if let path = indexPath {
-                tableView.insertRows(at: [path], with: .fade)
-            }
-        case .update:
-            if let path = indexPath {
-                let cell = tableView.cellForRow(at: path)
-                let country = fetchedController.object(at: path)
-                cell?.textLabel?.text = country.name
-            }
-        default:
-            break
+            case .delete:
+                if let path = indexPath {
+                    tableView.deleteRows(at: [path], with: .fade)
+                }
+            case .insert:
+                if let path = newIndexPath {
+                    tableView.insertRows(at: [path], with: .fade)
+                }
+            case .update:
+                if let path = indexPath {
+                    let cell = tableView.cellForRow(at: path)
+                    let country = fetchedController.object(at: path)
+                    cell?.textLabel?.text = country.name
+                }
+            default:
+                break
         }
     }
     
@@ -156,30 +140,5 @@ class CountriesTVController: UITableViewController, NSFetchedResultsControllerDe
             tableView.setEditing(false, animated: true)
         }
     }
-    
-    /*
-     // Override to support conditional editing of the table view.
-     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the specified item to be editable.
-     return true
-     }
-     */
-
-    /*
-     // Override to support rearranging the table view.
-     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-     
-     }
-     */
-    
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
 
 }

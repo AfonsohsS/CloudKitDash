@@ -90,53 +90,45 @@ class ApplicationData {
     }
     
     ///Method to insert a new City (Avaliar se Continua)
-    func insertCity(name: String) {
+    func insertCity(name: String, selectedCountry: Countries) {
         let text = name.trimmingCharacters(in: .whitespaces)
         
         if !text.isEmpty {
             
+            let newCity = Cities(context: self.context)
+            newCity.name = name
+            newCity.country = selectedCountry
+            newCity.ckUpload = true
+            newCity.ckPicture = true
+            newCity.ckReference = selectedCountry.ckRecordName
             
+            if let picture = UIImage(named: "Vancouver") {
+                newCity.picture = picture.pngData()
+            }
+            
+            let recordName = "idcity-\(UUID())"
             
             //As we know subscriptions require the records to be stored in a custom zone.
             // So we have to create one.
             let zone = CKRecordZone(zoneName: "listPlaces")
             
             //Create a unique value ID for the City in a specific custom zone
-            let id = CKRecord.ID(recordName: "idcity-\(UUID())", zoneID: zone.zoneID)
+            let id = CKRecord.ID(recordName: recordName, zoneID: zone.zoneID)
             
             //Create a record object of type Cities
             let record = CKRecord(recordType: Type.Cities.rawValue, recordID: id)
-            record.setObject(text as NSString, forKey: "cityName")
+            let coder = NSKeyedArchiver(requiringSecureCoding: true)
+            record.encodeSystemFields(with: coder)
             
-            //Create a reference to the Country the City belongs to, and an action of type "deleteSelf"
-            //"when the record of the country is deleted, this record is deleted as well."
-            let reference = CKRecord.Reference(recordID: selectedCountry, action: .deleteSelf)
-            record.setObject(reference, forKey: "country")
+            let metadata = coder.encodedData
+            newCity.ckMetadata = metadata
+            newCity.ckRecordName = recordName
             
-            //We get the URL of an image included in the project called Vancouver.jpg
-            let bundle = Bundle.main
-            if let fileURL = bundle.url(forResource: "Vancouver", withExtension: "jpg") {
-                
-                //Create a CKAsset object with it, and assign the object to the record
-                //of every city with the key "picture"
-                let asset = CKAsset(fileURL: fileURL)
-                record.setObject(asset, forKey: "picture")
-            }
-            
-            //Save record in CloudKit server asynchronously
-            database.save(record) { (recordSaved, error) in
-                
-                if error != nil {
-                    print("ERROR: O Registro da Cidade não foi salvo")
-                } else {
-                    
-                    //Add the record in Array listCities
-                    self.listCities.append(record)
-                    
-                    //Method to post a notification to tell the views that
-                    //they have to update the tables.
-                    self.updateInterface()
-                }
+            do {
+                try self.context.save()
+                self.uploadRecords()
+            } catch {
+                print("Error Saving New Country")
             }
         }
     }
@@ -203,7 +195,7 @@ class ApplicationData {
     }
     
     ///Alert Template for Country and City
-    func setAlert(type: String, title: String, style: UIAlertController.Style, message: String?) -> UIAlertController {
+    func setAlert(type: String, title: String, style: UIAlertController.Style, message: String?, selectedCountry: Countries?) -> UIAlertController {
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: style)
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
@@ -216,7 +208,7 @@ class ApplicationData {
                     self.insertCountry(name: name)
                     
                 } else if type == Type.Cities.rawValue {
-                    self.insertCity(name: name)
+                    self.insertCity(name: name, selectedCountry: selectedCountry!)
      
                 } else {
                     print("Type não indentificado")
