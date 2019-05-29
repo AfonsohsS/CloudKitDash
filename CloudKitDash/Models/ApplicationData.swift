@@ -5,6 +5,8 @@
 //  Created by Afonso H Sabino on 25/05/19.
 //  Copyright © 2019 Afonso H Sabino. All rights reserved.
 //
+// All code in this project is come from the book "iOS Apps for Masterminds"
+// You can know more about that in http://www.formasterminds.com
 
 import UIKit
 import CloudKit
@@ -20,19 +22,19 @@ class ApplicationData {
     
     //MARK: - Property to store the data locally
     
-    //Store a reference to the CloudKit's database
+    ///Store a reference to the CloudKit's database
     var database: CKDatabase!
     
-    //It's the reference to knbow which country has been selected by the user at any given moment
+    ///It's the reference to knbow which country has been selected by the user at any given moment
     var selectedCountry: CKRecord.ID!
     
-    //Array with the list of the countries already inserted in the database
+    ///Array with the list of the countries already inserted in the database
     var listCountries: [CKRecord] = []
     
-    //Array with the list of the cities available for a specific country
+    ///Array with the list of the cities available for a specific country
     var listCities: [CKRecord] = []
     
-    //Reference to the CoreData Context
+    ///Reference to the CoreData Context
     var context: NSManagedObjectContext!
     
     init() {
@@ -219,9 +221,9 @@ class ApplicationData {
         return alert
     }
     
-    //MARK: - Local Data Manipulation
+    //MARK: - Local Data Manipulation - Downloading Data
     
-    //This method is called after all the records are downloaded from CloudKit.
+    ///This method is called after all the records are downloaded from CloudKit.
     //Here, we have to read each record, extract the information, and store it in the persistent store.
     func updateLocalRecords(listRecordsUpdated: [CKRecord]) {
         
@@ -327,7 +329,7 @@ class ApplicationData {
         }
     }
     
-    //This method is called after records were deleted in CloudKit.
+    ///This method is called after records were deleted in CloudKit.
     //Here, we have to find the records of the same type and with the same name
     //in the persistent store and then use the delete() method to delete them.
     func deleteLocalRecords(listRecordsDeleted: [String:String]) {
@@ -371,8 +373,8 @@ class ApplicationData {
         }
     }
     
-    //Read all the Cities objects that have a value stored in the ckreference attribute
-    //and connect them with their Countries object through their country attribute
+    ///Read all the Cities objects that have a value stored in the ckreference attribute
+    ///and connect them with their Countries object through their country attribute
     func updateLocalReference() {
         let requestCities: NSFetchRequest<Cities> = Cities.fetchRequest()
         
@@ -408,6 +410,241 @@ class ApplicationData {
             } catch {
                 print("Error Saving Context")
             }
+        }
+    }
+    
+    //MARK: - Local Data Manipulation - Uploading Data
+    
+    /*
+     Note: Uploading the records one by one is not appropriate when working with a local storage.
+     We have to anticipate problems in the connection or the operation that will prevent some records
+     from being uploaded to the server. This is why we decided to mark each object in the persistent
+     store with a Boolean value stored in the ckupload attribute. If the attribute is true, we know that
+     the record was not uploaded yet and therefore we can include it on the list. This way, if a process
+     failed before, we do it again until all the records are uploaded to the CloudKit database.
+     */
+    
+    ///Methods to upload the records the user creates and delete those that the user removes.
+    //Uploading Multiple Records
+    func uploadRecords() {
+        let listRecordsToUpload = getRecordsToUpload()
+        if !listRecordsToUpload.isEmpty {
+            
+            //We call the configureDatabase() method first to make sure the database is properly configured.
+            configureDatabase {
+                let operation = CKModifyRecordsOperation(recordsToSave: listRecordsToUpload, recordIDsToDelete: nil)
+                operation.modifyRecordsCompletionBlock = { (records, recordsID, error) in
+                    if error != nil {
+                        print("ERROR Uploading Records")
+                    } else {
+                        
+                        //Set the values of the ckupload attribute of each record in the persistent store
+                        //back to false, so they are not uploaded again.
+                        self.clearCoreDataRecord()
+                    }
+                }
+                self.database.add(operation)
+            }
+        }
+    }
+    
+    ///Getting all the records in the persistent store that has to be uploaded
+    //The method looks for the Countries and Cities objects with the ckupload
+    //attribute equal to true, adds them to an array, and returns it.
+    func getRecordsToUpload() -> [CKRecord] {
+        
+        /*
+         NOTE: We can't send Core Data objects to CloudKit, we first have to convert them
+         to CKRecord objects. The problem is that if we just create a new CKRecord object
+         every time the user modifies an existing record in the persistent store, the database
+         won't be able to match the records and will add a new record instead of modifying the old one
+         
+         This is another reason why we included the ckmetadata attribute in every Countries and
+         Cities object with the metadata of the record. To allow the server to match the record
+         we are sending with those already stored in the database, we have to include the values
+         contained in this metadata, and this is the first thing we do with each record.
+         */
+        
+        var list: [CKRecord] = []
+        
+        //First to Countries
+        let requestCountries: NSFetchRequest<Countries> = Countries.fetchRequest()
+        requestCountries.predicate = NSPredicate(format: "ckUpload = true")
+        
+        do {
+            let result = try context.fetch(requestCountries)
+            
+            for item in result {
+                var recordTemp: CKRecord!
+                
+                //The metadata is unarchived with an NSKeyedUnarchiver object and we get
+                //a CKRecord object in return.
+                if let coder = try? NSKeyedUnarchiver(forReadingFrom: item.ckMetadata!) {
+                    coder.requiresSecureCoding = true
+                    
+                    //Returns a CKRecord object with the values
+                    recordTemp = CKRecord(coder: coder)
+                    coder.finishDecoding()
+                }
+                
+                //Assign to this CKRecord object the rest of the values that were modified by the user
+                //(e.g., the name of the country)
+                if let record = recordTemp {
+                    record.setObject(item.name! as NSString, forKey: "name")
+                    
+                    //Add the record to the array
+                    list.append(record)
+                }
+            }
+        } catch {
+            print("Error Fetching")
+        }
+        
+        //Second to Cities
+        let requestCities: NSFetchRequest<Cities> = Cities.fetchRequest()
+        requestCities.predicate = NSPredicate(format: "ckUpload = true")
+        
+        do {
+            let result = try context.fetch(requestCities)
+            
+            for item in result {
+                var recordTemp: CKRecord!
+                if let coder = try? NSKeyedUnarchiver(forReadingFrom: item.ckMetadata!) {
+                    coder.requiresSecureCoding = true
+                    recordTemp = CKRecord(coder: coder)
+                    coder.finishDecoding()
+                }
+                if let record = recordTemp {
+                    record.setObject(item.name! as NSString, forKey: "name")
+                    
+                    //Get the Picture
+                    if item.ckPicture && item.picture != nil {
+                        
+                        //Get URL of  the Temp Directory
+                        var url = URL(fileURLWithPath: NSTemporaryDirectory())
+                        
+                        //Add the name of the file to the path
+                        url = url.appendingPathComponent("tempFile.png")
+                        
+                        //Create a temporary file with this data and then create the CKAsset
+                        // object from the URL of this file
+                        do {
+                            let pngImage = item.picture!
+                            
+                            //Store the data in the file
+                            try pngImage.write(to: url, options: .atomic)
+                            let asset = CKAsset(fileURL: url)
+                            record.setObject(asset, forKey: "picture")
+                        } catch {
+                            print("Error Image Not Stored")
+                        }
+                    }
+                    
+                    //Get the Zone and Reference
+                    if let country = item.country {
+                        let  zone = CKRecordZone(zoneName: "listPlaces")
+                        let id = CKRecord.ID(recordName: country.ckRecordName!, zoneID: zone.zoneID)
+                        let reference = CKRecord.Reference(recordID: id, action: .deleteSelf)
+                        record.setObject(reference, forKey: "country")
+                    }
+                    list.append(record)
+                }
+            }
+        } catch {
+            print("Error Fetching")
+        }
+        return list
+    }
+    
+    ///Cleaning up the objects in the persistent store
+    func clearCoreDataRecord() {
+        
+        /*
+         When the operation finish uploading all the records, we have to change the values of the
+         ckupload attribute of each object to false, so they are not uploaded again.
+         Notice that for the Cities objects, we also have to change the value of the ckpicture
+         attribute to indicate that the pictures were also uploaded.
+         */
+        
+        //First fetch Countries and change ckUpload to false
+        let requestCountries: NSFetchRequest<Countries> = Countries.fetchRequest()
+        requestCountries.predicate = NSPredicate(format: "ckUpload = true")
+        
+        do {
+            let result = try context.fetch(requestCountries)
+            for item in result {
+                item.ckUpload = false
+            }
+        } catch {
+            print("Error Fetching Countries in clearCoreDataRecord()")
+        }
+        
+        //Second repeat the same fetch to Cities
+        let requestCities: NSFetchRequest<Cities> = Cities.fetchRequest()
+        requestCities.predicate = NSPredicate(format: "ckUpload = true")
+        
+        do {
+            let result = try context.fetch(requestCities)
+            for item in result {
+                item.ckUpload = false
+                item.ckPicture = false
+            }
+        } catch {
+            print("Error Fetching Cities in clearCoreDataRecord()")
+        }
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                print("Error Saving Context in clearCoreDataRecord()")
+            }
+        }
+    }
+    
+    ///Erase the records in CloudKit that correspond to the objects removed by the user from the persistent store.
+    func removeRecords() {
+        
+        /*
+         Create an object of type CKDelete with the record name of each of the Countries and Cities
+         objects deleted by the user and then remove them from the persistent store. This way,
+         to reflect the changes in the CloudKit database, we just have to call a method in our model
+         to erase the records that match the record names stored in the CKDelete entity.
+         */
+        
+        var listRecordsToDelete: [CKRecord.ID] = []
+        
+        let request: NSFetchRequest<CKDelete> = CKDelete.fetchRequest()
+        
+        do {
+            let result = try context.fetch(request)
+            for item in result {
+                let zone = CKRecordZone(zoneName: item.zoneName!)
+                let id = CKRecord.ID(recordName: item.recordName!, zoneID: zone.zoneID)
+                listRecordsToDelete.append(id)
+            }
+        } catch {
+            print("Error Fetching Record ID in removeRecords()")
+        }
+        if !listRecordsToDelete.isEmpty {
+            let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: listRecordsToDelete)
+            operation.modifyRecordsCompletionBlock = { (records, recordsID, error) in
+                if error != nil {
+                    print("Error Releting Records in removeRecords()")
+                } else {
+                    let request: NSFetchRequest<CKDelete> = CKDelete.fetchRequest()
+                    
+                    do {
+                        let result = try self.context.fetch(request)
+                        for item in result {
+                            self.context.delete(item)
+                        }
+                        try self.context.save()
+                    } catch {
+                        print("Error Deleting in removeRecords()")
+                    }
+                }
+            }
+            database.add(operation)
         }
     }
     

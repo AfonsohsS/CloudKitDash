@@ -5,6 +5,8 @@
 //  Created by Afonso H Sabino on 25/05/19.
 //  Copyright © 2019 Afonso H Sabino. All rights reserved.
 //
+// All code in this project is come from the book "iOS Apps for Masterminds"
+// You can know more about that in http://www.formasterminds.com
 
 import UIKit
 
