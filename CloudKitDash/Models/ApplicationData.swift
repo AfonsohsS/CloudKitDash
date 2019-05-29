@@ -102,7 +102,7 @@ class ApplicationData {
             newCity.ckPicture = true
             newCity.ckReference = selectedCountry.ckRecordName
             
-            if let picture = UIImage(named: "Vancouver") {
+            if let picture = UIImage(named: "Vancouver.jpg") {
                 newCity.picture = picture.pngData()
             }
             
