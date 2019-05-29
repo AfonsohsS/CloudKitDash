@@ -45,7 +45,7 @@ class CountriesTVController: UITableViewController, NSFetchedResultsControllerDe
     
     //Add new Country
     @IBAction func addCountry(_ sender: UIBarButtonItem) {
-        present(AppData.setAlert(type: "Country", title: "Insert Country", style: .alert, message: "Add a new country to the list", selectedCountry: nil), animated: true)
+        present(AppData.setAlert(type: "Countries", title: "Insert Country", style: .alert, message: "Add a new country to the list", selectedCountry: nil), animated: true)
     }
     
     @IBAction func editCountry(_ sender: UIBarButtonItem) {

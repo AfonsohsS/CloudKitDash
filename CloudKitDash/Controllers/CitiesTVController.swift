@@ -48,7 +48,7 @@ class CitiesTVController: UITableViewController, NSFetchedResultsControllerDeleg
     }
     
     @IBAction func addCity(_ sender: UIBarButtonItem) {
-        present(AppData.setAlert(type: "City", title: "Insert City", style: .alert, message: "Add a new city to the list", selectedCountry: self.selectedCountry), animated: true)
+        present(AppData.setAlert(type: "Cities", title: "Insert City", style: .alert, message: "Add a new city to the list", selectedCountry: self.selectedCountry), animated: true)
     }
     
     @IBAction func editCity(_ sender: UIBarButtonItem) {
