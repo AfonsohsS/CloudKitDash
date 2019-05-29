@@ -2,7 +2,7 @@
 //  CountriesTVController.swift
 //  CloudKitDash
 //
-//  Created by Afonso H Sabino on 25/05/19.
+//  Created by Afonso H Sabino on 29/05/19.
 //  Copyright © 2019 Afonso H Sabino. All rights reserved.
 //
 // All code in this project is come from the book "iOS Apps for Masterminds"
@@ -10,24 +10,49 @@
 
 import UIKit
 import CloudKit
+import CoreData
 
-class CountriesTVController: UITableViewController {
+class CountriesTVController: UITableViewController, NSFetchedResultsControllerDelegate {
 
+    var context: NSManagedObjectContext!
+    
+    //The viewControllers defines this fetch object to get the objects from the
+    //persistent store and feed the table view
+    var fetchedController: NSFetchedResultsController<Countries>!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //Observer to Update Interface to call updateInterface()
-        let notCenter = NotificationCenter.default
-        let name = Notification.Name("Update Interface")
-        notCenter.addObserver(self, selector: #selector(updateInterface(notification:)), name: name, object: nil)
+        ///NÃO ESQUECER DE BUSCAR ALTERNATIVA MELHOR PARA ISSO
+        let app = UIApplication.shared
+        let appDelegate = app.delegate as! AppDelegate
+        context = appDelegate.context
         
-        //Read and show the values when the view is loaded
-        //The method performs a query on the database to get all the countries
-        //available and posts a notification when it is over
-        AppData.readCountries()
+        let request: NSFetchRequest<Countries> = Countries.fetchRequest()
+        let sort = NSSortDescriptor(key: "name", ascending: true)
+        request.sortDescriptors = [sort]
         
-        //Note: This is why we register the observer for the notification before calling the method
-
+        fetchedController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedController.delegate = self
+        
+        do {
+            try fetchedController.performFetch()
+        } catch {
+            print("Error Fetching Data in Countries viewDidLoad()")
+        }
+        
+//        //Observer to Update Interface to call updateInterface()
+//        let notCenter = NotificationCenter.default
+//        let name = Notification.Name("Update Interface")
+//        notCenter.addObserver(self, selector: #selector(updateInterface(notification:)), name: name, object: nil)
+//
+//        //Read and show the values when the view is loaded
+//        //The method performs a query on the database to get all the countries
+//        //available and posts a notification when it is over
+//        AppData.readCountries()
+//
+//        //Note: This is why we register the observer for the notification before calling the method
+        
     }
     
     @objc func updateInterface(notification: Notification) {
@@ -41,76 +66,120 @@ class CountriesTVController: UITableViewController {
     
     @IBAction func editCountry(_ sender: UIBarButtonItem) {
         
+        if tableView.isEditing {
+            tableView.setEditing(false, animated: true)
+        } else {
+            tableView.setEditing(true, animated: true)
+        }
     }
-    
-    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showCities" {
+            
+            let vc = segue.destination as! CitiesTVController
+            
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let record = AppData.listCountries[indexPath.row]
-                AppData.selectedCountry = record.recordID
+                
+                let country = fetchedController.object(at: indexPath)
+                vc.selectedCountry = country
             }
         }
     }
     
-
-    // MARK: - Table view data source
-
+    // MARK: - Table view data source and delegate
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return AppData.listCountries.count
+        
+        if let sections = fetchedController.sections {
+            let sectionInfo = sections[section]
+            return sectionInfo.numberOfObjects
+        }
+        return 0
     }
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "countriesCell", for: indexPath)
-
-        let record = AppData.listCountries[indexPath.row]
         
-        if let name = record["countryName"] as? String {
-            cell.textLabel?.text = name
-        }
-
+        let country = fetchedController.object(at: indexPath)
+        cell.textLabel?.text = country.name
+        
         return cell
     }
-
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        switch type {
+        case .delete:
+            if let path = indexPath {
+                tableView.deleteRows(at: [path], with: .fade)
+            }
+        case .insert:
+            if let path = indexPath {
+                tableView.insertRows(at: [path], with: .fade)
+            }
+        case .update:
+            if let path = indexPath {
+                let cell = tableView.cellForRow(at: path)
+                let country = fetchedController.object(at: path)
+                cell?.textLabel?.text = country.name
+            }
+        default:
+            break
+        }
     }
-    */
-
-    /*
-    // Override to support editing the table view.
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.beginUpdates()
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.endUpdates()
+    }
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            let country = fetchedController.object(at: indexPath)
+            
+            //Add a CKDelete object to the persistent store with the information about the record
+            //we have to delete from CloudKit, and then delete the Countries object from Core Data
+            let newItem = CKDelete(context: context)
+            newItem.zoneName = "listPlaces"
+            newItem.recordName = country.ckRecordName
+            context.delete(country)
+            
+            do {
+                try self.context.save()
+                AppData.removeRecords()
+            } catch {
+                print("Error Deleting Country")
+            }
+            tableView.setEditing(false, animated: true)
+        }
     }
-    */
+    
+    /*
+     // Override to support conditional editing of the table view.
+     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+     // Return false if you do not want the specified item to be editable.
+     return true
+     }
+     */
 
     /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
+     // Override to support rearranging the table view.
+     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+     
+     }
+     */
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destination.
+     // Pass the selected object to the new view controller.
+     }
+     */
 
 }

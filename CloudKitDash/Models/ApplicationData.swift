@@ -50,46 +50,52 @@ class ApplicationData {
     
     //MARK: - Model Functions to Insert Data
     
-    ///Method to insert a new Country
+    ///Method to insert a new Country (Avaliar se Continua)
     func insertCountry(name: String) {
         let text = name.trimmingCharacters(in: .whitespaces)
         
-        if text != "" {
+        if !text.isEmpty {
+            
+            let newCountry = Countries(context: self.context)
+            newCountry.name = name
+            newCountry.ckUpload = true
+            
+            let recordName = "idcountry-\(UUID())"
             
             //As we know subscriptions require the records to be stored in a custom zone.
             // So we have to create one.
             let zone = CKRecordZone(zoneName: "listPlaces")
             
             //Create a unique value ID for the Countries in a specific custom zone
-            let id = CKRecord.ID(recordName: "idcountry-\(UUID())", zoneID: zone.zoneID)
+            let id = CKRecord.ID(recordName: recordName, zoneID: zone.zoneID)
             
             //Create a record object of type Countries
             let record = CKRecord(recordType: Type.Countries.rawValue, recordID: id)
-            record.setObject(text as NSString, forKey: "countryName")
+            let coder = NSKeyedArchiver(requiringSecureCoding: true)
+            record.encodeSystemFields(with: coder)
             
-            //Save record in CloudKit server
-            database.save(record) { (recordSaved, error) in
-                
-                if error != nil {
-                    print("ERROR: O Registro do País não foi salvo")
-                } else {
-                    
-                    //Add the record in Array listCountries
-                    self.listCountries.append(record)
-                    
-                    //Method to post a notification to tell the views that
-                    //they have to update the tables.
-                    self.updateInterface()
-                }
+            //Every time the user inserts a new country, we have to create a temporary CKRecord object
+            //and encode its metadata with an NSKeyedArchiver object.
+            let metadata = coder.encodedData
+            newCountry.ckMetadata = metadata
+            newCountry.ckRecordName = recordName
+            
+            do {
+                try self.context.save()
+                self.uploadRecords()
+            } catch {
+                print("Error Saving New Country")
             }
         }
     }
     
-    ///Method to insert a new City
+    ///Method to insert a new City (Avaliar se Continua)
     func insertCity(name: String) {
         let text = name.trimmingCharacters(in: .whitespaces)
         
-        if text != "" {
+        if !text.isEmpty {
+            
+            
             
             //As we know subscriptions require the records to be stored in a custom zone.
             // So we have to create one.
@@ -208,8 +214,10 @@ class ApplicationData {
                 
                 if type == Type.Countries.rawValue {
                     self.insertCountry(name: name)
+                    
                 } else if type == Type.Cities.rawValue {
                     self.insertCity(name: name)
+     
                 } else {
                     print("Type não indentificado")
                 }
