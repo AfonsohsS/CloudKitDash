@@ -161,6 +161,9 @@
 					14C7738722997FD000336D8B = {
 						CreatedOnToolsVersion = 10.2.1;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.Push = {
 								enabled = 1;
 							};
@@ -360,7 +363,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = CloudKitDash/CloudKitDash.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CloudKitDash/Resources/CloudKitDash.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33SVN5UKMP;
 				INFOPLIST_FILE = CloudKitDash/Info.plist;
@@ -379,7 +382,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = CloudKitDash/CloudKitDash.entitlements;
+				CODE_SIGN_ENTITLEMENTS = CloudKitDash/Resources/CloudKitDash.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33SVN5UKMP;
 				INFOPLIST_FILE = CloudKitDash/Info.plist;

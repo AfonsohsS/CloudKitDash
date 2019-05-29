@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         userSettings.register(defaults: values)
         
         //Setting CoreData's container and context
-        container = NSPersistentContainer(name: "places")
+        container = NSPersistentContainer(name: "Places")
         container.loadPersistentStores { (storeDescription, error) in
             if error != nil {
                 print("Error loading data")

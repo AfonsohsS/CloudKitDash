@@ -10,6 +10,12 @@ import UIKit
 import CloudKit
 import CoreData
 
+//Enum to the Entities Name
+enum Type: String {
+    case Countries
+    case Cities
+}
+
 class ApplicationData {
     
     //MARK: - Property to store the data locally
@@ -56,7 +62,7 @@ class ApplicationData {
             let id = CKRecord.ID(recordName: "idcountry-\(UUID())", zoneID: zone.zoneID)
             
             //Create a record object of type Countries
-            let record = CKRecord(recordType: "Countries", recordID: id)
+            let record = CKRecord(recordType: Type.Countries.rawValue, recordID: id)
             record.setObject(text as NSString, forKey: "countryName")
             
             //Save record in CloudKit server
@@ -91,7 +97,7 @@ class ApplicationData {
             let id = CKRecord.ID(recordName: "idcity-\(UUID())", zoneID: zone.zoneID)
             
             //Create a record object of type Cities
-            let record = CKRecord(recordType: "Cities", recordID: id)
+            let record = CKRecord(recordType: Type.Cities.rawValue, recordID: id)
             record.setObject(text as NSString, forKey: "cityName")
             
             //Create a reference to the Country the City belongs to, and an action of type "deleteSelf"
@@ -136,7 +142,7 @@ class ApplicationData {
         //TRUEPREDICATE keyword determines that the predicate will always return
         //the value true, so we get back all the records available
         let predicate = NSPredicate(format: "TRUEPREDICATE")
-        let query = CKQuery(recordType: "Countries", predicate: predicate)
+        let query = CKQuery(recordType: Type.Countries.rawValue, predicate: predicate)
         
         database.perform(query, inZoneWith: nil) { (records, error) in
             
@@ -160,7 +166,7 @@ class ApplicationData {
         //Getting the list of cities that belong to the country selected by the user
         if selectedCountry != nil {
             let predicate = NSPredicate(format: "country = %@", selectedCountry)
-            let query = CKQuery(recordType: "Cities", predicate: predicate)
+            let query = CKQuery(recordType: Type.Cities.rawValue, predicate: predicate)
             database.perform(query, inZoneWith: nil) { (records, error) in
                 
                 if error != nil {
@@ -198,9 +204,9 @@ class ApplicationData {
             if let fields = alert.textFields {
                 let name = fields[0].text!
                 
-                if type == "Country" {
+                if type == Type.Countries.rawValue {
                     self.insertCountry(name: name)
-                } else if type == "City" {
+                } else if type == Type.Cities.rawValue {
                     self.insertCity(name: name)
                 } else {
                     print("Type não indentificado")
@@ -213,7 +219,199 @@ class ApplicationData {
         return alert
     }
     
-    //MARK: - Contact the CloudKit servers
+    //MARK: - Local Data Manipulation
+    
+    //This method is called after all the records are downloaded from CloudKit.
+    //Here, we have to read each record, extract the information, and store it in the persistent store.
+    func updateLocalRecords(listRecordsUpdated: [CKRecord]) {
+        
+        for record in listRecordsUpdated {
+            
+            //we first get the record's metadata.
+            //Because this is a collection of values, the framework offers a convenient
+            //method for this purpose called encodeSystemFields().
+            //This method takes an NSKeyedArchiver object to encode all the values at once
+            //and produces a Data structure we can get from the object's encodedData property.
+            let coder = NSKeyedArchiver(requiringSecureCoding: true)
+            record.encodeSystemFields(with: coder)
+            let recordMetadata = coder.encodedData
+            
+            //Note: With this Data structure containing the record's metadata, the record's type,
+            // and its identifier (record's name), we have all the information we need to insert
+            // the record in the persistent store.
+            
+            let recordType = record.recordType
+            let recordName = record.recordID.recordName
+            
+            
+            //Check the Type (Countries or Cities)
+            if recordType == Type.Countries.rawValue {
+                
+                //Create a predicate to look for a record with the same record name
+                //Note: This is not the name of the country or city but the name of the record we
+                // defined with the UUID() function when the record was created for the first time)
+                let request: NSFetchRequest<Countries> = Countries.fetchRequest()
+                request.predicate = NSPredicate(format: "ckRecordName = %@", recordName)
+                
+                do {
+                    var country: Countries!
+                    let result = try context.fetch(request)
+                    
+                    //If the record is not found (result is empty), we create a new Countries object
+                    //and assign the record name to its ckRecordName property
+                    if result.isEmpty {
+                        country = Countries(context: context)
+                        country.ckRecordName = recordName
+                    } else {
+                        country = result[0]
+                    }
+                    
+                    //Otherwise, we get the record and update its attributes
+                    country.ckMetadata = recordMetadata
+                    country.ckUpload = false
+                    country.name = record["name"] as? String
+                } catch {
+                    print("Error Fetching Data")
+                }
+            } else if recordType == Type.Cities.rawValue {
+                
+                //Create a predicate to look for a record with the same record name
+                //Note: This is not the name of the country or city but the name of the record we
+                // defined with the UUID() function when the record was created for the first time)
+                let request: NSFetchRequest<Cities> = Cities.fetchRequest()
+                request.predicate = NSPredicate(format: "ckRecordName = %@", recordName)
+                
+                do {
+                    var city: Cities!
+                    let result = try context.fetch(request)
+                    
+                    //If the record is not found (result is empty), we create a new Countries object
+                    //and assign the record name to its ckRecordName property
+                    if result.isEmpty {
+                        city = Cities(context: context)
+                        city.ckRecordName = recordName
+                    } else {
+                        city = result[0]
+                    }
+                    
+                    //Otherwise, we get the record and update its attributes
+                    city.ckMetadata = recordMetadata
+                    city.ckUpload = false
+                    city.ckPicture = false
+                    city.name = record["name"] as? String
+                    
+                    //Store the record name of the country the city belongs to (stored in the
+                    //Reference object identified with the string "country")
+                    if let reference = record["country"] as? CKRecord.Reference {
+                        city.ckReference = reference.recordID.recordName
+                    }
+                    
+                    //Get the picture from the CKAsset.
+                    if let asset = record["picture"] as? CKAsset {
+                        let picture = UIImage(contentsOfFile: asset.fileURL!.path)
+                        city.picture = picture?.pngData()
+                    }
+                } catch {
+                    print("Error Fetching Data")
+                }
+            }
+        }
+        
+        //If there are changes in context, save it.
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                print("Error Saving Context")
+            }
+        }
+    }
+    
+    //This method is called after records were deleted in CloudKit.
+    //Here, we have to find the records of the same type and with the same name
+    //in the persistent store and then use the delete() method to delete them.
+    func deleteLocalRecords(listRecordsDeleted: [String:String]) {
+        
+        for (recordName, recordType) in listRecordsDeleted {
+            
+            if recordType == Type.Countries.rawValue {
+                let request: NSFetchRequest<Countries> = Countries.fetchRequest()
+                request.predicate = NSPredicate(format: "ckRecordName = %@", recordName)
+                
+                do {
+                    let result = try context.fetch(request)
+                    if !result.isEmpty {
+                        let country = result[0]
+                        context.delete(country)
+                    }
+                } catch {
+                    print("Error Fetching")
+                }
+            } else if recordType == Type.Cities.rawValue {
+                let request: NSFetchRequest<Cities> = Cities.fetchRequest()
+                request.predicate = NSPredicate(format: "ckRecordName = %@", recordName)
+                
+                do {
+                    let result = try context.fetch(request)
+                    if !result.isEmpty {
+                        let city = result[0]
+                        context.delete(city)
+                    }
+                } catch {
+                    print("Error Fetching")
+                }
+            }
+        }
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                print("Error Saving Context")
+            }
+        }
+    }
+    
+    //Read all the Cities objects that have a value stored in the ckreference attribute
+    //and connect them with their Countries object through their country attribute
+    func updateLocalReference() {
+        let requestCities: NSFetchRequest<Cities> = Cities.fetchRequest()
+        
+        //We use the value of the ckreference attribute in the Cities objects to determine
+        //whether the reference was already created in Core Data or not.
+        requestCities.predicate = NSPredicate(format: "ckReference != nil")
+        
+        //If the value is different than nil, we search for a country with that record name
+        //and if we find it, we assign it to the country property of the Cities object, thus
+        //defining the relationship and connecting the city with its country.
+        do {
+            let listCities = try context.fetch(requestCities)
+            for city in listCities {
+                let requestCountries: NSFetchRequest<Countries> = Countries.fetchRequest()
+                requestCountries.predicate = NSPredicate(format: "ckRecordName = %@", city.ckReference!)
+                
+                do {
+                    let listCountries = try context.fetch(requestCountries)
+                    if !listCountries.isEmpty {
+                        city.country = listCountries[0]
+                        city.ckReference = nil
+                    }
+                } catch {
+                    print("Error Fetching")
+                }
+            }
+        } catch {
+            print("Error Fetching")
+        }
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                print("Error Saving Context")
+            }
+        }
+    }
+    
+    //MARK: - Contact the CloudKit Servers
     //Two methods that are going to contact the CloudKit servers and process the information by Subscription
     
     ///Method to create the subscription and the zone
@@ -396,7 +594,7 @@ class ApplicationData {
                     
                     //First we have to check if the record is of type Countries or Cities
                     // and store the record in the corresponding array
-                    if record.recordType == "Countries" {
+                    if record.recordType == Type.Countries.rawValue {
                         
                         //We use the firstIndex() method to look for duplicates
                         //If the record already exists in the array, we update its values,
@@ -410,7 +608,7 @@ class ApplicationData {
                             self.listCountries.append(record)
                         }
                         
-                    } else if record.recordType == "Cities" {
+                    } else if record.recordType == Type.Cities.rawValue {
                         
                         //we first check whether the record contains a reference to a country and
                         //only update or add the record to the array if the reference corresponds
@@ -440,14 +638,14 @@ class ApplicationData {
                     
                     listRecordsDeleted[recordID.recordName] = recordType
                     
-                    if recordType == "Countries" {
+                    if recordType == Type.Countries.rawValue {
                         let index = self.listCountries.firstIndex(where: { (item) -> Bool in
                             return item.recordID == recordID
                         })
                         if index != nil {
                             self.listCountries.remove(at: index!)
                         }
-                    } else if recordType == "Cities" {
+                    } else if recordType == Type.Cities.rawValue {
                         let index = self.listCities.firstIndex(where: { (item) -> Bool in
                             return item.recordID == recordID
                         })
