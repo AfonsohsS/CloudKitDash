@@ -27,12 +27,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          subscription we also have to create a record zone and store all our
          records in it. This is why, the first thing we do when the application
          is launched, is to store two Boolean values in the User Defaults database
-         called "subscriptionSaved" and "zoneCreated". These values will be used
-         later to know whether or not we have already created the subscription and
-         the custom zone.
+         called "subscriptionSaved", "zoneCreated" and "iCloudAvailable". These
+         values will be used later to know whether or not we have already created
+         the subscription, the custom zone and iCloud Account is available.
         */
         let userSettings = UserDefaults.standard
-        let values = ["subscriptionSaved" : false, "zoneCreated" : false]
+        let values = ["subscriptionSaved" : false, "zoneCreated" : false, "iCloudAvailable" : false]
         userSettings.register(defaults: values)
         
         //Setting CoreData's container and context
@@ -47,6 +47,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //Register the application with icloud servers
         application.registerForRemoteNotifications()
+        
+        /*
+         Every time we want to perform an operation on the servers, we can check the value
+         of the iCloudAvailable key to know whether an iCloud account is available.
+         */
+        
+        let containerCloudKit = CKContainer.default()
+        containerCloudKit.accountStatus { (status, error) in
+            
+            //If iCloud Account is available, check for Updates
+            if status == CKAccountStatus.available {
+                let mainQueue = OperationQueue.main
+                mainQueue.addOperation {
+                    userSettings.set(true, forKey: "iCloudAvailable")
+                    AppData.checkUpdates(finishClosure: { (result) in
+                        return
+                    })
+                }
+            } else {
+                print("Error Cloud Connection")
+            }
+        }
         
         AppData.configureDatabase {}
         

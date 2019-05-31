@@ -448,6 +448,60 @@ class ApplicationData {
         }
     }
     
+    ///Methods to process the failed records one by one.
+    func uploadFailedRecords(failedRecords: [CKRecord]) {
+        for record in failedRecords {
+            
+            //Get the metadata from the record received from the server
+            //(the metadata includes the record's tag)
+            let coder = NSKeyedArchiver(requiringSecureCoding: true)
+            record.encodeSystemFields(with: coder)
+            let recordMetadata = coder.encodedData
+            let recordType = record.recordType
+            let recordName = record.recordID.recordName
+            
+            if recordType == Type.Countries.rawValue {
+                let request: NSFetchRequest<Countries> = Countries.fetchRequest()
+                request.predicate = NSPredicate(format: "ckRecordName = %@", recordName)
+                
+                //Updates the ckmetadata attribute of the corresponding object in the persistent store with this value
+                do {
+                    let result = try context.fetch(request)
+                    if !result.isEmpty {
+                        let item = result[0]
+                        item.ckMetadata = recordMetadata
+                    }
+                } catch {
+                    print("Error Fetching Country Record in uploadFailedRecords()")
+                }
+            } else if recordType == Type.Cities.rawValue {
+                let request: NSFetchRequest<Cities> = Cities.fetchRequest()
+                request.predicate = NSPredicate(format: "ckRecordName = %@", recordName)
+                
+                do {
+                    let result = try context.fetch(request)
+                    if !result.isEmpty {
+                        let item = result[0]
+                        item.ckMetadata = recordMetadata
+                    }
+                } catch {
+                    print("Error Fetching City Record in uploadFailedRecords()")
+                }
+            }
+        }
+        
+        //When all the objects in the persistent store are updated, we call the uploadRecords()
+        //method to upload everything again.
+        if context.hasChanges {
+            do {
+                try self.context.save()
+                uploadRecords()
+            } catch {
+                print("Error Saving Context in uploadFailedRecords()")
+            }
+        }
+    }
+    
     ///Getting all the records in the persistent store that has to be uploaded
     //The method looks for the Countries and Cities objects with the ckupload
     //attribute equal to true, adds them to an array, and returns it.
@@ -709,7 +763,7 @@ class ApplicationData {
     }
     
     ///Method to download and process the changes in the database
-    func checkUpdates(finishClosure: @escaping (UIBackgroundFetchResult) -> Void) {
+    @objc func checkUpdates(finishClosure: @escaping (UIBackgroundFetchResult) -> Void) {
         
         //To make sure that the database is configured properly, we call configureDatabase()
         configureDatabase {
@@ -901,9 +955,10 @@ class ApplicationData {
                 
                 //Operation 4: The same above
                 fetchOperation.recordZoneFetchCompletionBlock = { (zoneID, token, data, more, error) in
-             
-                    if error != nil {
-                        print("Error in fetchOperation.recordZoneFetchCompletionBlock")
+                    
+                    //If there is an error and we can cast it as a CKError object, the processErrors() method is executed.
+                    if let ckError = error as? CKError {
+                        CloudErrors.processErrors(error: ckError)
                     } else {
                         changeZoneToken = token
                         

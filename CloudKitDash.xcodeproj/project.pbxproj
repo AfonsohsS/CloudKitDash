@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		14313523229F1B1500DBCB67 /* CountriesTVController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14313522229F1B1500DBCB67 /* CountriesTVController.swift */; };
 		14313526229F2FEF00DBCB67 /* OldCitiesTVController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14313525229F2FEF00DBCB67 /* OldCitiesTVController.swift */; };
+		1431352B229FE73D00DBCB67 /* CloudErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1431352A229FE73D00DBCB67 /* CloudErrors.swift */; };
 		14C7738C22997FD000336D8B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7738B22997FD000336D8B /* AppDelegate.swift */; };
 		14C7739122997FD000336D8B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14C7738F22997FD000336D8B /* Main.storyboard */; };
 		14C7739322997FD200336D8B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C7739222997FD200336D8B /* Assets.xcassets */; };
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		14313522229F1B1500DBCB67 /* CountriesTVController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountriesTVController.swift; sourceTree = "<group>"; };
 		14313525229F2FEF00DBCB67 /* OldCitiesTVController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldCitiesTVController.swift; sourceTree = "<group>"; };
+		1431352A229FE73D00DBCB67 /* CloudErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudErrors.swift; sourceTree = "<group>"; };
 		14C7738822997FD000336D8B /* CloudKitDash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CloudKitDash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C7738B22997FD000336D8B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14C7739022997FD000336D8B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				14C773A32299834400336D8B /* ApplicationData.swift */,
+				1431352A229FE73D00DBCB67 /* CloudErrors.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -228,6 +231,7 @@
 			files = (
 				14313523229F1B1500DBCB67 /* CountriesTVController.swift in Sources */,
 				14C773A92299F2A600336D8B /* OldCountriesTVController.swift in Sources */,
+				1431352B229FE73D00DBCB67 /* CloudErrors.swift in Sources */,
 				14C773A42299834400336D8B /* ApplicationData.swift in Sources */,
 				14C773AB2299F2BB00336D8B /* CitiesTVController.swift in Sources */,
 				14313526229F2FEF00DBCB67 /* OldCitiesTVController.swift in Sources */,
